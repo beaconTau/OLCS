@@ -138,7 +138,7 @@ class Radio_Emission:
                                     plots=False)
         #x = np.arange(-1.0, 1.0, 0.05) # km
         x = np.array(sep_vals)
-        print Xmax_dist # km
+        print(Xmax_dist) # km
         y = np.sqrt(x**2 + Xmax_dist**2 - 2*x*Xmax_dist*np.cos(pi/2-zenith_angle_rad))
         thv = np.arccos((y**2 + Xmax_dist**2 - x**2)/(2.*y*Xmax_dist))
         '''
@@ -181,7 +181,7 @@ class Radio_Emission:
         norm = 5.5e-5+6.6e-5*(theta_CR_deg/45.)
         if(theta_CR_deg>45.):
             norm = 1.2e-4*(90.-theta_CR_deg)/45.
-        print sep, sig, norm
+        print(sep, sig, norm)
         return self.double_gaussian(dist_core_km, sep, sig, norm)
     
     def radio_beam_model2(self, theta_CR_deg, view_angle, altitude_km):

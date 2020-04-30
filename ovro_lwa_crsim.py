@@ -37,12 +37,12 @@ if __name__ == "__main__":
             args.output_tag = 'run_E_%1.1f_r_%1.1f'%(args.log10_energy, args.radius_km)
         else:
             args.output_tag = 'run_E_%1.1f_thz_%1.1f_r_%1.1f'%(args.log10_energy, args.zenith_angle_deg, args.radius_km)
-    print args.output_tag
+    print(args.output_tag)
 
-    print ''
-    print 'SIMULATION PARAMETERS' 
-    print args
-    print ''
+    print('')
+    print('SIMULATION PARAMETERS') 
+    print(args)
+    print('')
 
 
     # point to the OVRO-LWA_CRSIM installation dir
@@ -74,14 +74,14 @@ if __name__ == "__main__":
     trigger = 0
     figure(1)
     for evn in range(0, args.num_particles): 
-        if evn%500 == 0: print evn
+        if evn%500 == 0: print(evn)
 
         det_arr.get_distances_and_view_angles(XMC, geom, event=evn)
         # first cut by minimum view angle here.
         if np.min(det_arr.th_view*180./pi)> 10.: continue
     
         th_z = np.arccos(geom.k_z[evn])*180./pi
-        E_field,dist = rad_em.radio_beam_model2(th_z, det_arr.th_view, 1.2) # 1.2 is the altitude
+        E_field,dist = rad_em.radio_beam_model2(th_z, det_arr.th_view, XMC.detector_altitude_km) #
         E_field *= 10**(args.log10_energy-17.)
         x_pol, y_pol, z_pol = rad_em.get_pol(XMC.x_max[evn],  XMC.y_max[evn],  XMC.z_max[evn], geom.x_pos[evn], geom.y_pos[evn], geom.z_pos[evn])
         max_val = vmax=np.max(np.array(E_field)*1.e6)
@@ -115,9 +115,9 @@ if __name__ == "__main__":
         
 
     #show()
-    print 'trigger', trigger
-    print 10**(args.log10_energy-17.)
-    print 'det.V_rms', det.V_rms
+    print('trigger', trigger)
+    print(10**(args.log10_energy-17.))
+    print('det.V_rms', det.V_rms)
     '''
     figure(figsize=(4,4))
     plot(geom.x_pos, geom.y_pos, '.', alpha=0.1)

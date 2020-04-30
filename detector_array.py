@@ -1,37 +1,34 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-Created on Tue Aug 28 12:50:02 2018
+Created on April 29 2020
 
-@author: romerowo
+@author: romerowo, swissel
 """
 
-import pandas as pd
 import numpy as np
 
 class Detector_Array:
-    def __init__(self, mode='file', fnm='OV-LWA_256_32_64_ant_config_B_2018JAN08.xls'):
-        self.df = None
-        if mode=='file':
-            self.df = pd.read_excel(fnm, sheet_name='Sheet1', header = None)
-            self.x = self.df[0][0:256]*1.e-3
-            self.y = self.df[1][0:256]*1.e-3
-            #self.x = self.df[0][0:251]*1.e-3
-            #self.y = self.df[1][0:251]*1.e-3
-            self.z = 1.222*np.ones(len(self.x)) # elevation of OVRO-LWA
-        if mode=='Ryan':
-            self.x = []
-            self.y = []
-            self.z = []
-            self.z0 = 1.222
-            for line in file('OVRO-LWA_256_ant_pos_Ryan.txt'):
-                #print line
-                self.x.append(float(line.split(',')[0]))
-                self.y.append(float(line.split(',')[1]))
-                self.z.append(float(line.split(',')[2]))
-            self.x = np.array(self.x)*1.e-3
-            self.y = np.array(self.y)*1.e-3
-            self.z = self.z0 + np.array(self.z)*1.e-3
+    def __init__(self, mode='prototype_2019'):
+        if mode=='prototype_2018':
+            # position of antenna0 measured in Google Earth for 2019 array. Should be updated
+            self.detector_altitude_km = 3.87553 # Elevation of center of antenna 0 in km
+            self.detector_lat_A0 = 37.589310    # Latitude in degrees of A0
+            self.detector_lon_A0 = -118.237621  # Longitude in degrees of A0
+            # stored in km, using estimate from Kaeli Hughes of the antenna positions as of 4/29/2020
+            self.x = np.array([0,-6.039, -1.272, 3.411 ]) * 1e-3
+            self.y = np.array([0,-1.618, -10.362, -11.897]) * 1e-3
+            self.z = np.array([0,2.275, 1.282, -0.432]) * 1e-3 + self.detector_altitude_km
+            
+        if mode=='prototype_2019':  
+            # position of antenna0 measured in Google Earth
+            self.detector_altitude_km = 3.87553 # Elevation of center of antenna 0 in km
+            self.detector_lat_A0 = 37.589310    # Latitude in degrees of A0
+            self.detector_lon_A0 = -118.237621  # Longitude in degrees of A0
+            # stored in km, using estimate from Dan Southall of the physical positions of the antennas as of 4/29/2020
+            self.x = np.array([0,-33.49373061801294, -8.660668526919165, -32.16822443711699 ]) * 1e-3
+            self.y = np.array([0,-12.216161215847706, -44.5336329143579, -43.200941168610264]) * 1e-3
+            self.z = np.array([0,15.23990049241125, 5.489838290379097, 11.889772376808601]) * 1e-3 + self.detector_altitude_km  
         
     ####################################################################################
 

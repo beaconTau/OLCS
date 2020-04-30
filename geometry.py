@@ -9,11 +9,12 @@ Created on Tue Aug 21 17:06:16 2018
 import numpy as np
 
 class Geometry:
-    def __init__(self, radius_km, num_events, zen_angle_deg=None):
+    def __init__(self, radius_km, num_events, detector_altitude_km=3.87553, zen_angle_deg=None):
         self.num_events = num_events
         self.radius_km = radius_km
         self.Area = np.pi*radius_km**2
         self.AOmega = np.pi * self.Area
+        self.detector_altitude_km = detector_altitude_km
         self.get_random_interaction_point()
         self.zen_angle_deg = zen_angle_deg
         self.get_random_direction(zen_angle_deg=self.zen_angle_deg)
@@ -25,7 +26,7 @@ class Geometry:
         self.phi_pos = np.random.uniform(0., 2.*np.pi, self.num_events)
         self.x_pos   = self.R_pos*np.cos(self.phi_pos)
         self.y_pos   = self.R_pos*np.sin(self.phi_pos)
-        self.z_pos   = 1.222*np.ones(len(self.R_pos))
+        self.z_pos   = self.detector_altitude_km * np.ones(len(self.R_pos))
         
     ####################################################################################
 

@@ -11,7 +11,7 @@ from geometry import Geometry
 from scipy.interpolate import Akima1DInterpolator
 
 class Xmax_calc:
-    def __init__(self, d_lam=0.1, detector_altitude_km=1.222):
+    def __init__(self, d_lam=0.1, detector_altitude_km=3.880):
         self.Earth_radius   = 6371.      # km
         self.detector_altitude_km = detector_altitude_km
         self.d_lam = d_lam

@@ -15,7 +15,7 @@ class Detector:
         self.kB = 1.3806488e-17 #Watt / MHz / Kelvin 
         self.c = 299.792458 # in m MHz
         self.Z0 = 120.*np.pi# Ohms
-        f = np.load('filter_function_20190115.npz')
+        f = np.load('filter_function.npz')
         self.filter = f['filter_array'] # made for self.fr_fine = np.arange(30., 80.1, 0.1)
         #self.filter = 1.
         #self.filter[250] = 1.
@@ -27,7 +27,7 @@ class Detector:
         zen_gain = np.array([8.6, 8.03, 7.28, 5.84, 4.00,  0., -2.9, -8.3, -40.])
         self.zen_gain_interp = Akima1DInterpolator(zen, zen_gain-3.) # -3 is the conversion from dBic to dBi in linear polarization
 
-        '''Antenna impeance'''
+        '''Antenna impedance'''
         fr =   [24., 34.,    44.,  54.,  64.,  74.,   84.,   94.]
         Z_re = [1.8,  10.,   40.,  128., 317., 271.,  158.,  129.]
         Z_im = [-68.5, 12.6, 91.5, 169., 88.2, -80.3, -89.4, -58]

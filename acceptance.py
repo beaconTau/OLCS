@@ -6,8 +6,8 @@ Created on Wed Dec 19 13:25:21 2018
 @author: romerowo
 """
 
-#import matplotlib
-#matplotlib.use('Agg')
+# import matplotlib
+# matplotlib.use('Agg')
 import sys
 from pylab import *
 
@@ -22,19 +22,22 @@ def acceptance_sim(radius_km = 10.,
                    zenith_angle_deg = None, 
                    log10_energy=17.,
                    SNR_thresh = 5.,
-                   N_trig = 16,
+                   N_trig = 1,
+                   trig_pol = 'hpol',
+                   detector_mode = 'prototype_2018',
+                   detector_altitude_km = 3.87553,
                    verbose = False):
     '''
     SETUP
     '''
-    geom = Geometry(radius_km, num_particles, zenith_angle_deg)
+    geom = Geometry(radius_km, num_particles, detector_altitude_km, zenith_angle_deg)
     
     XMC = Xmax_calc()
     # I want to provide the energy, cosmic ray ground position and direction, and get the Xmax position
     XMC.get_Xmax_position(log10_energy, geom)
     Xmax_altitude = np.sqrt(XMC.x_max**2 + XMC.y_max**2 + XMC.z_max**2) - XMC.Earth_radius - XMC.detector_altitude_km
     
-    det_arr = Detector_Array(mode='Ryan')
+    det_arr = Detector_Array(mode=detector_mode)
     
     rad_em = Radio_Emission(plots=False)
     
@@ -48,14 +51,14 @@ def acceptance_sim(radius_km = 10.,
     for evn in range(0, num_particles): 
         if evn%500 == 0: 
             if verbose: 
-                print '%d of %d'%(evn, num_particles)
+                print(('%d of %d'%(evn, num_particles)))
     
         det_arr.get_distances_and_view_angles(XMC, geom, event=evn)
         # first cut by minimum view angle here.
         if np.min(det_arr.th_view*180./pi)> 10.: continue
     
         th_z = np.arccos(geom.k_z[evn])*180./pi
-        E_field,dist = rad_em.radio_beam_model2(th_z, det_arr.th_view, 1.2) # 1.2 is the altitude
+        E_field,dist = rad_em.radio_beam_model2(th_z, det_arr.th_view, XMC.detector_altitude_km) 
         E_field *= 10**(log10_energy-17.)
         x_pol, y_pol, z_pol = rad_em.get_pol(XMC.x_max[evn],  XMC.y_max[evn],  XMC.z_max[evn]-XMC.Earth_radius, geom.x_pos[evn], geom.y_pos[evn], geom.z_pos[evn])
         max_val = np.max(np.array(E_field)*1.e6)
@@ -78,22 +81,23 @@ def acceptance_sim(radius_km = 10.,
     
         cut_x = SNR_x>SNR_thresh
         cut_y = SNR_y>SNR_thresh
-    
-        #if evn%100 == 0:
-        #    print evn, '%1.1f, %1.2e, %d, %d'%(np.min(det_arr.th_view*180./pi), max_val, np.sum(cut_x), np.sum(cut_y))
-        #    print '\t %1.1f %1.1f'%(np.max(SNR_x), np.max(SNR_y))
-        #if( np.sum(cut_x)>=N_trig or np.sum(cut_y) >= N_trig):
+        cut_z = SNR_z>SNR_thresh
+        if( trig_pol == 'hpol'):
+            cut_trig_pol = np.logical_or(cut_x, cut_y)
+        elif( trig_pol == 'vpol'):
+            cut_trig_pol = cut_z
+        else:
+            print("Warning: trigger must be 'hpol' or 'vpol'. Nothing will trigger")
+            cut_trig_pol = np.zeros(len(cut_x))
+
         event_trigger = 0
-        for FPGA in range(16):
-            if( np.sum(cut_x[FPGA*16:(FPGA+1)*16]) + np.sum(cut_y[FPGA*16:(FPGA+1)*16]) >= N_trig):
-            #if( np.sum(cut_x[FPGA*16:(FPGA+1)*16])>=N_trig or np.sum(cut_y[FPGA*16:(FPGA+1)*16]) >= N_trig ):
-        
-                event_trigger = 1
-                if verbose:
-                    print '\t d_core  %1.2f'%(np.sqrt(geom.x_pos[evn]**2 + geom.y_pos[evn]**2))
-                    print '\t th_view %1.2f %1.2f'%(np.min(det_arr.th_view)*180./pi, np.max(det_arr.th_view)*180./pi) 
-                    print '\t th_zen %1.2f'%(np.arccos(geom.k_z[evn])*180./pi)
-                    print '\t=================\n'
+        if(  np.sum(cut_trig_pol) >= N_trig):
+            event_trigger = 1
+            if verbose:
+                print(('\t d_core  %1.2f'%(np.sqrt(geom.x_pos[evn]**2 + geom.y_pos[evn]**2))))
+                print(('\t th_view %1.2f %1.2f'%(np.min(det_arr.th_view)*180./pi, np.max(det_arr.th_view)*180./pi))) 
+                print(('\t th_zen %1.2f'%(np.arccos(geom.k_z[evn])*180./pi)))
+                print('\t=================\n')
         # Estimate Guassian power residual if the event triggers
         if event_trigger == 1:
             thz_array.append(th_z)
