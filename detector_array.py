@@ -11,7 +11,7 @@ import numpy as np
 class Detector_Array:
     def __init__(self, mode='prototype_2019'):
         if mode=='prototype_2018':
-            # position of antenna0 measured in Google Earth for 2019 array. Should be updated
+            # position of antenna0 measured in Google Earth for 2018 array. Should be updated
             self.detector_altitude_km = 3.87553 # Elevation of center of antenna 0 in km
             self.detector_lat_A0 = 37.589310    # Latitude in degrees of A0
             self.detector_lon_A0 = -118.237621  # Longitude in degrees of A0
@@ -52,3 +52,6 @@ class Detector_Array:
         #print cos_view_angle
         self.th_view   = np.arccos(cos_view_angle)
         self.dist_Xmax = np.array(r2) 
+    
+    def plot_array():
+        
